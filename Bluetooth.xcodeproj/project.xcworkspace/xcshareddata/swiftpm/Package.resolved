@@ -1,0 +1,16 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "BaseDesignFramework",
+        "repositoryURL": "https://github.com/rmanjil/BaseDesignFramework",
+        "state": {
+          "branch": null,
+          "revision": "9142ba02a3208a70f1c2416e40b1cb8bb8dee337",
+          "version": "1.0.3"
+        }
+      }
+    ]
+  },
+  "version": 1
+}
