@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2A29933D26C22B520073671D /* ChooseController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A29933C26C22B520073671D /* ChooseController.swift */; };
+		2A29934026C2340C0073671D /* IQKeyboardManagerSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 2A29933F26C2340C0073671D /* IQKeyboardManagerSwift */; };
+		2A29934226C234220073671D /* CentralController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A29934126C234220073671D /* CentralController.swift */; };
 		2A8DEBE626C0F119007C50B1 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A8DEBE526C0F119007C50B1 /* AppDelegate.swift */; };
 		2A8DEBE826C0F119007C50B1 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A8DEBE726C0F119007C50B1 /* SceneDelegate.swift */; };
 		2A8DEBEA26C0F119007C50B1 /* ListController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A8DEBE926C0F119007C50B1 /* ListController.swift */; };
@@ -16,6 +19,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		2A29933C26C22B520073671D /* ChooseController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChooseController.swift; sourceTree = "<group>"; };
+		2A29934126C234220073671D /* CentralController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CentralController.swift; sourceTree = "<group>"; };
 		2A8DEBE226C0F119007C50B1 /* Bluetooth.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Bluetooth.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2A8DEBE526C0F119007C50B1 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		2A8DEBE726C0F119007C50B1 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -31,6 +36,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				2A8DEBFB26C0F5CD007C50B1 /* BaseDesignFramework in Frameworks */,
+				2A29934026C2340C0073671D /* IQKeyboardManagerSwift in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -62,6 +68,8 @@
 				2A8DEBEE26C0F11B007C50B1 /* Assets.xcassets */,
 				2A8DEBF026C0F11B007C50B1 /* LaunchScreen.storyboard */,
 				2A8DEBF326C0F11B007C50B1 /* Info.plist */,
+				2A29933C26C22B520073671D /* ChooseController.swift */,
+				2A29934126C234220073671D /* CentralController.swift */,
 			);
 			path = Bluetooth;
 			sourceTree = "<group>";
@@ -84,6 +92,7 @@
 			name = Bluetooth;
 			packageProductDependencies = (
 				2A8DEBFA26C0F5CD007C50B1 /* BaseDesignFramework */,
+				2A29933F26C2340C0073671D /* IQKeyboardManagerSwift */,
 			);
 			productName = Bluetooth;
 			productReference = 2A8DEBE226C0F119007C50B1 /* Bluetooth.app */;
@@ -114,6 +123,7 @@
 			mainGroup = 2A8DEBD926C0F119007C50B1;
 			packageReferences = (
 				2A8DEBF926C0F5CD007C50B1 /* XCRemoteSwiftPackageReference "BaseDesignFramework" */,
+				2A29933E26C2340C0073671D /* XCRemoteSwiftPackageReference "IQKeyboardManager" */,
 			);
 			productRefGroup = 2A8DEBE326C0F119007C50B1 /* Products */;
 			projectDirPath = "";
@@ -142,7 +152,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				2A8DEBEA26C0F119007C50B1 /* ListController.swift in Sources */,
+				2A29934226C234220073671D /* CentralController.swift in Sources */,
 				2A8DEBE626C0F119007C50B1 /* AppDelegate.swift in Sources */,
+				2A29933D26C22B520073671D /* ChooseController.swift in Sources */,
 				2A8DEBE826C0F119007C50B1 /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -337,6 +349,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		2A29933E26C2340C0073671D /* XCRemoteSwiftPackageReference "IQKeyboardManager" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/hackiftekhar/IQKeyboardManager.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 6.5.6;
+			};
+		};
 		2A8DEBF926C0F5CD007C50B1 /* XCRemoteSwiftPackageReference "BaseDesignFramework" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/rmanjil/BaseDesignFramework";
@@ -348,6 +368,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		2A29933F26C2340C0073671D /* IQKeyboardManagerSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2A29933E26C2340C0073671D /* XCRemoteSwiftPackageReference "IQKeyboardManager" */;
+			productName = IQKeyboardManagerSwift;
+		};
 		2A8DEBFA26C0F5CD007C50B1 /* BaseDesignFramework */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 2A8DEBF926C0F5CD007C50B1 /* XCRemoteSwiftPackageReference "BaseDesignFramework" */;

@@ -9,6 +9,15 @@
           "revision": "9142ba02a3208a70f1c2416e40b1cb8bb8dee337",
           "version": "1.0.3"
         }
+      },
+      {
+        "package": "IQKeyboardManagerSwift",
+        "repositoryURL": "https://github.com/hackiftekhar/IQKeyboardManager.git",
+        "state": {
+          "branch": null,
+          "revision": "4dc6bc7d1c9747bd0c261c8c055903f9fdef91f7",
+          "version": "6.5.6"
+        }
       }
     ]
   },

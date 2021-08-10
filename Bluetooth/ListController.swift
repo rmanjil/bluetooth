@@ -118,16 +118,22 @@ class ListController: BaseController  {
     private var peripheral: CBPeripheral!
     private var remotePeripheral = [CBPeripheral]()
     
+    lazy var nextButton: UIBarButtonItem = {
+        let button = UIBarButtonItem(title: "Next", style:  .plain, target: self, action:  #selector(goNext))
+        
+        return button
+    }()
+    
     // MARK: - Life cycle
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+         navigationItem.rightBarButtonItems = [nextButton]
         // Do any additional setup after loading the view.
         centralManager = CBCentralManager(delegate: self, queue: nil)
         
     }
-    
-    
+  
+
     // MARK: - override
     override func setupUI() {
         setUpTableView()
@@ -148,6 +154,13 @@ extension ListController {
         }.store(in: &baseViewModel.bag)
     }
     
+    
+    @objc private func goNext() {
+        print("test")
+        let controller = ChooseController(baseView: ChooseScreen(), baseViewModel: BaseViewModel())
+        navigationController?.pushViewController(controller, animated: true)
+    }
+    
 }
 // MARK: - TableView Delegate and DataSource Handler
 extension ListController: UITableViewDataSource, UITableViewDelegate {
@@ -163,7 +176,7 @@ extension ListController: UITableViewDataSource, UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell =  tableView.dequeueCell(UITableViewCell.self, for: indexPath)
-        cell.textLabel?.text =  remotePeripheral[indexPath.row].name
+        cell.textLabel?.text =  remotePeripheral[indexPath.row].name ?? "No Name"
         return cell
     }
     
@@ -267,7 +280,6 @@ extension ListController: CBPeripheralDelegate {
     func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
         if let data = characteristic.value {
             
-            
             let string = String(data: data, encoding: .utf8)
             let str = String(decoding: data, as: UTF8.self)
             let oldText = screen.updateValue.text + "\n"
@@ -281,8 +293,8 @@ extension ListController: CBPeripheralDelegate {
         if let error = error {
             print("characteristics  update error error: \(error.localizedDescription)")
         }
-        
-        
-    }
+   }
     
 }
+
+
