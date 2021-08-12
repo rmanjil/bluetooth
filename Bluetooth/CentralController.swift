@@ -160,6 +160,12 @@ class CentralController: BaseController {
         
     }
     
+    override func viewDidDisappear(_ animated: Bool) {
+        centralManager.stopScan()
+        super.viewDidDisappear(animated)
+    }
+    
+    // MARK: - override
     override func setupUI() {
         setUpTable()
     }
@@ -183,9 +189,10 @@ extension CentralController {
               let data = screen.textView.text.data(using: .utf8) else {
              return
         }
-        discoveredPeripheral.writeValue(data, for: transferCharacteristic, type: .withResponse)
+        discoveredPeripheral.writeValue(data, for: transferCharacteristic, type: .withoutResponse)
         message.append(Message(message: screen.textView.text, itsMine: true))
         screen.textView.text = ""
+        screen.tableView.reloadData()
     }
 }
 
@@ -329,7 +336,7 @@ extension CentralController: CBPeripheralDelegate {
        
         let msg = Message(message: string, itsMine: false)
         message.append(msg)
-        
+        screen.tableView.reloadData()
     }
     
     func peripheral(_ peripheral: CBPeripheral, didUpdateNotificationStateFor characteristic: CBCharacteristic, error: Error?) {

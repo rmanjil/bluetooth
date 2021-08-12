@@ -16,6 +16,7 @@
 		2A8DEBEF26C0F11B007C50B1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2A8DEBEE26C0F11B007C50B1 /* Assets.xcassets */; };
 		2A8DEBF226C0F11B007C50B1 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2A8DEBF026C0F11B007C50B1 /* LaunchScreen.storyboard */; };
 		2A8DEBFB26C0F5CD007C50B1 /* BaseDesignFramework in Frameworks */ = {isa = PBXBuildFile; productRef = 2A8DEBFA26C0F5CD007C50B1 /* BaseDesignFramework */; };
+		2AABD7C726C379F600D558D6 /* PeripheralController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AABD7C626C379F600D558D6 /* PeripheralController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,6 +29,7 @@
 		2A8DEBEE26C0F11B007C50B1 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		2A8DEBF126C0F11B007C50B1 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		2A8DEBF326C0F11B007C50B1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		2AABD7C626C379F600D558D6 /* PeripheralController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PeripheralController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -70,6 +72,7 @@
 				2A8DEBF326C0F11B007C50B1 /* Info.plist */,
 				2A29933C26C22B520073671D /* ChooseController.swift */,
 				2A29934126C234220073671D /* CentralController.swift */,
+				2AABD7C626C379F600D558D6 /* PeripheralController.swift */,
 			);
 			path = Bluetooth;
 			sourceTree = "<group>";
@@ -152,6 +155,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				2A8DEBEA26C0F119007C50B1 /* ListController.swift in Sources */,
+				2AABD7C726C379F600D558D6 /* PeripheralController.swift in Sources */,
 				2A29934226C234220073671D /* CentralController.swift in Sources */,
 				2A8DEBE626C0F119007C50B1 /* AppDelegate.swift in Sources */,
 				2A29933D26C22B520073671D /* ChooseController.swift in Sources */,

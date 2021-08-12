@@ -99,6 +99,3 @@ extension ChooseController {
 
 
 
-class PeripheralController: BaseController {
-    
-}
