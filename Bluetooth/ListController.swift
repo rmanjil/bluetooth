@@ -283,7 +283,7 @@ extension ListController: CBPeripheralDelegate {
             let string = String(data: data, encoding: .utf8)
             let str = String(decoding: data, as: UTF8.self)
             let oldText = screen.updateValue.text + "\n\n"
-            screen.updateValue.text = oldText + "\(characteristic.uuid) -> \(string ?? "Empty"), \(str) at \(Date()) "
+            screen.updateValue.text = oldText + "\(characteristic.uuid)(\(characteristic.uuid.uuidString)) -> \(string ?? "Empty"), \(str) at \(Date()) "
             
             if let error = error {
                 print(error.localizedDescription)
