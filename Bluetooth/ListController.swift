@@ -176,7 +176,7 @@ extension ListController: UITableViewDataSource, UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell =  tableView.dequeueCell(UITableViewCell.self, for: indexPath)
-        cell.textLabel?.text =  remotePeripheral[indexPath.row].name ?? "No Name"
+        cell.textLabel?.text =  remotePeripheral[indexPath.row].name ?? "Unknown"
         return cell
     }
     
@@ -188,7 +188,7 @@ extension ListController: UITableViewDataSource, UITableViewDelegate {
         screen.deviceDetailHolder.isHidden = !screen.tableView.isHidden
         centralManager.stopScan()
         
-        screen.deviceName.text = peripheral.name ?? "No Name"
+        screen.deviceName.text = peripheral.name ?? "Unknown"
     }
     
     
@@ -201,6 +201,12 @@ extension ListController: CBCentralManagerDelegate {
         switch central.state {
         case .poweredOff:
             consoleLog = "BLE is powered off"
+            remotePeripheral = []
+            if peripheral != nil {
+            peripheral.delegate = nil
+                peripheral = nil
+            }
+            screen.tableView.reloadData()
         case .poweredOn:
             consoleLog = "BLE is poweredOn"
             centralManager.scanForPeripherals(withServices: nil, options: nil)
