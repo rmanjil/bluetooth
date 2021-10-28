@@ -10,6 +10,14 @@ import BaseDesignFramework
 import CoreBluetooth
 import Combine
 
+enum Judgment: String {
+    case notPass = "-"
+    case tighteningDirectionNG = "D"
+    case ok = "O"
+    case lowNG = "L"
+    case highNG = "H"
+}
+
 class ListView: BaseView {
     private(set) lazy var blueToothStatus: UILabel = {
         let label = UILabel()
@@ -57,6 +65,14 @@ class ListView: BaseView {
         
     }()
     
+    private(set) lazy var  valueName: UITextView = {
+        let label = UITextView()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.textAlignment = .center
+        label.isEditable = false
+        return label
+        
+    }()
     
     private(set) lazy var reset: UIButton = {
         let label = UIButton()
@@ -64,6 +80,53 @@ class ListView: BaseView {
         label.setTitle("RESET", for: .normal)
         return label
         
+    }()
+    
+    private(set) lazy var clear: UIButton = {
+        let label = UIButton()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.setTitle("Clear", for: .normal)
+        return label
+        
+    }()
+    
+    private(set) lazy var send: UIButton = {
+        let label = UIButton()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.setTitle("send", for: .normal)
+        return label
+        
+    }()
+    
+    private(set) lazy var stackTextsView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        stackView.distribution = .fill
+        stackView.axis = .vertical
+        return stackView
+    }()
+    
+    private(set) lazy var stackTextView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        stackView.distribution = .fillEqually
+        stackView.axis = .vertical
+        return stackView
+    }()
+    private(set) lazy var stackButtonView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        stackView.distribution = .fillEqually
+        
+        return stackView
+    }()
+    
+    private(set) lazy var text: UITextField = {
+        let stackView = UITextField()
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        stackView.backgroundColor = .lightGray
+        stackView.textColor = .black
+        return stackView
     }()
     
     
@@ -76,8 +139,17 @@ class ListView: BaseView {
         stackView.addArrangedSubview(deviceDetailHolder)
         
         deviceDetailHolder.addSubview(deviceName)
-        deviceDetailHolder.addSubview(updateValue)
-        deviceDetailHolder.addSubview(reset)
+        deviceDetailHolder.addSubview(stackTextsView)
+        stackTextsView.addArrangedSubview(stackTextView)
+        stackTextsView.addArrangedSubview(text)
+        
+        
+        stackTextView.addArrangedSubview(updateValue)
+        stackTextView.addArrangedSubview(valueName)
+        deviceDetailHolder.addSubview(stackButtonView)
+        stackButtonView.addArrangedSubview(reset)
+        stackButtonView.addArrangedSubview(clear)
+        stackButtonView.addArrangedSubview(send)
         
         
         NSLayoutConstraint.activate([
@@ -95,16 +167,17 @@ class ListView: BaseView {
             deviceName.topAnchor.constraint(equalTo: deviceDetailHolder.topAnchor, constant: 4),
             deviceName.centerXAnchor.constraint(equalTo: deviceDetailHolder.centerXAnchor),
             
-            updateValue.leadingAnchor.constraint(equalTo: deviceDetailHolder.leadingAnchor, constant: 4),
-            updateValue.topAnchor.constraint(equalTo: deviceName.bottomAnchor, constant: 4),
-            updateValue.centerXAnchor.constraint(equalTo: deviceDetailHolder.centerXAnchor),
+            stackTextsView.leadingAnchor.constraint(equalTo: deviceDetailHolder.leadingAnchor, constant: 4),
+            stackTextsView.topAnchor.constraint(equalTo: deviceName.bottomAnchor, constant: 4),
+            stackTextsView.centerXAnchor.constraint(equalTo: deviceDetailHolder.centerXAnchor),
             
+            stackButtonView.leadingAnchor.constraint(equalTo: deviceDetailHolder.leadingAnchor, constant: 4),
+            stackButtonView.topAnchor.constraint(equalTo: stackTextsView.bottomAnchor, constant: 4),
+            stackButtonView.bottomAnchor.constraint(equalTo: deviceDetailHolder.bottomAnchor, constant: -4),
+            stackButtonView.centerXAnchor.constraint(equalTo: deviceDetailHolder.centerXAnchor),
+            stackButtonView.heightAnchor.constraint(equalToConstant: 40),
+            text.heightAnchor.constraint(equalToConstant: 40)
             
-            reset.leadingAnchor.constraint(equalTo: deviceDetailHolder.leadingAnchor, constant: 4),
-            reset.topAnchor.constraint(equalTo: updateValue.bottomAnchor, constant: 4),
-            reset.bottomAnchor.constraint(equalTo: deviceDetailHolder.bottomAnchor, constant: -4),
-            reset.centerXAnchor.constraint(equalTo: deviceDetailHolder.centerXAnchor),
-            reset.heightAnchor.constraint(equalToConstant: 40),
         ])
     }
 }
@@ -117,23 +190,33 @@ class ListController: BaseController  {
     private var centralManager: CBCentralManager!
     private var peripheral: CBPeripheral!
     private var remotePeripheral = [CBPeripheral]()
-    
+    private var transferCharacteristic: CBCharacteristic?
     lazy var nextButton: UIBarButtonItem = {
         let button = UIBarButtonItem(title: "Next", style:  .plain, target: self, action:  #selector(goNext))
         
         return button
     }()
     
+    
+    var response = ""
+    var torque = ""
+    var unit = ""
+    var angele = ""
+    var angleUnit = ""
+    var judgment = ""
+    var date = ""
+    var time = ""
     // MARK: - Life cycle
     override func viewDidLoad() {
         super.viewDidLoad()
-         navigationItem.rightBarButtonItems = [nextButton]
+        navigationItem.rightBarButtonItems = [nextButton]
         // Do any additional setup after loading the view.
         centralManager = CBCentralManager(delegate: self, queue: nil)
         
+        
     }
-  
-
+    
+    
     // MARK: - override
     override func setupUI() {
         setUpTableView()
@@ -150,7 +233,23 @@ extension ListController {
             guard let self = self else { return }
             self.centralManager.scanForPeripherals(withServices: nil, options: nil)
             self.screen.tableView.isHidden = false
+            self.screen.updateValue.text = ""
+            self.screen.valueName.text = ""
+            self.response = ""
             self.screen.deviceDetailHolder.isHidden = !self.screen.tableView.isHidden
+        }.store(in: &baseViewModel.bag)
+        
+        
+        screen.clear.publisher(for: .touchUpInside).receive(on: RunLoop.main).sink { [weak self] _ in
+            guard let self = self else { return }
+            self.screen.updateValue.text = ""
+            self.screen.valueName.text = ""
+            self.response = ""
+        }.store(in: &baseViewModel.bag)
+        
+        screen.send.publisher(for: .touchUpInside).receive(on: RunLoop.main).sink { [weak self] _ in
+            guard let self = self else { return }
+            self.sendMessage()
         }.store(in: &baseViewModel.bag)
     }
     
@@ -181,14 +280,33 @@ extension ListController: UITableViewDataSource, UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-                peripheral = remotePeripheral[indexPath.row]
-                peripheral.delegate = self
-                centralManager.connect(peripheral, options: nil)
+        peripheral = remotePeripheral[indexPath.row]
+        peripheral.delegate = self
+        centralManager.connect(peripheral, options: nil)
         screen.tableView.isHidden = true
         screen.deviceDetailHolder.isHidden = !screen.tableView.isHidden
         centralManager.stopScan()
         
         screen.deviceName.text = peripheral.name ?? "Unknown"
+    }
+    
+    private  func sendMessage() {
+        guard !(screen.text.text ?? "").isEmpty,
+              let discoveredPeripheral = peripheral,
+              let transferCharacteristic = transferCharacteristic else {
+                  // let data = "L,10,U,15".data(using: .utf8) else {
+                  return
+              }
+        "RE037,20.00,10.00".forEach { string in
+            if let data = (String(string)).data(using: .utf8) {
+                discoveredPeripheral.writeValue(data, for: transferCharacteristic, type: .withResponse)
+                
+            }
+            
+        }
+//        if let data = "L,10,U,15".data(using: .utf8) {
+//            discoveredPeripheral.writeValue(data, for: transferCharacteristic, type: .withResponse) }
+        
     }
     
     
@@ -203,7 +321,7 @@ extension ListController: CBCentralManagerDelegate {
             consoleLog = "BLE is powered off"
             remotePeripheral = []
             if peripheral != nil {
-            peripheral.delegate = nil
+                peripheral.delegate = nil
                 peripheral = nil
             }
             screen.tableView.reloadData()
@@ -235,7 +353,8 @@ extension ListController: CBCentralManagerDelegate {
     }
     
     func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
-        peripheral.discoverServices(nil)
+        //peripheral.discoverServices(nil)
+        peripheral.discoverServices([TransferService.serviceTochiUUID])
         
     }
     
@@ -270,7 +389,7 @@ extension ListController: CBPeripheralDelegate {
         guard let characteristics = service.characteristics else { return }
         
         for characteristic in characteristics {
-            
+            print(characteristic.description)
             if characteristic.properties.contains(.read) {
                 print("\(characteristic.uuid): properties contains .read")
                 peripheral.readValue(for: characteristic)
@@ -279,6 +398,13 @@ extension ListController: CBPeripheralDelegate {
                 print("\(characteristic.uuid): properties contains .notify")
                 peripheral.setNotifyValue(true, for: characteristic)
             }
+            
+            if characteristic.properties.contains(.write) {
+                print("\(characteristic.uuid): properties contains .write")
+                transferCharacteristic = characteristic
+                
+            }
+            
         }
     }
     
@@ -286,10 +412,39 @@ extension ListController: CBPeripheralDelegate {
     func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
         if let data = characteristic.value {
             
+            
             let string = String(data: data, encoding: .utf8)
             let str = String(decoding: data, as: UTF8.self)
-            let oldText = screen.updateValue.text + "\n\n"
-            screen.updateValue.text = oldText + "\(characteristic.uuid)(\(characteristic.uuid.uuidString)) -> \(string ?? "Empty"), \(str) at \(Date()) "
+            let oldValue  = screen.valueName.text ?? ""
+            
+            response += string ?? ""
+            
+            screen.valueName.text = oldValue +  (string ?? "")
+            let oldText = screen.updateValue.text + "\n===============\n"
+            screen.updateValue.text = oldText + "\(characteristic.uuid)(\(characteristic.uuid.uuidString)) -> data: (\(string ?? "Empty")), -data (\(str)) at \(Date()) "
+            
+//            if value.count == 58 {
+//                print("all value \(value)")
+//
+         //   }
+            
+            if response.contains("\r\n") {
+                print("all value \(response)")
+                let array = response.split(separator: ",")
+                print(array)
+                torque = String(array[2])
+                
+                unit =  String(array[3])
+                angele =  String(array[4])
+                angleUnit =  String(array[5])
+                judgment =  String(array[6])
+                date =  String(array[8])
+                time =  String(array[9])
+                
+                let final = judgmentValue(string: judgment)
+                response = ""
+            }
+            
             
             if let error = error {
                 print(error.localizedDescription)
@@ -299,7 +454,87 @@ extension ListController: CBPeripheralDelegate {
         if let error = error {
             print("characteristics  update error error: \(error.localizedDescription)")
         }
-   }
+    }
+    
+    func peripheral(_ peripheral: CBPeripheral, didUpdateNotificationStateFor characteristic: CBCharacteristic, error: Error?) {
+        if let error = error {
+            print("error \(error.localizedDescription)")
+            return
+        }
+        print("notify")
+        // Exit if it's not the transfer characteristic
+        guard characteristic.uuid == TransferService.characteristicUUID else { return }
+        
+        if characteristic.isNotifying {
+            // Notification has started
+            print("notify")
+        } else {
+            // Notification has stopped, so disconnect from the peripheral
+            
+        }
+    }
+    
+    func peripheralIsReady(toSendWriteWithoutResponse peripheral: CBPeripheral) {
+       // sendMessage()
+    }
+    
+    func peripheral(_ peripheral: CBPeripheral, didWriteValueFor descriptor: CBDescriptor, error: Error?) {
+        if let error = error {
+            print("error \(error.localizedDescription)")
+            return
+        }
+    }
+    
+    func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor descriptor: CBDescriptor, error: Error?) {
+        if let error = error {
+            print("error \(error.localizedDescription)")
+            return
+        }
+    }
+    
+    func peripheral(_ peripheral: CBPeripheral, didWriteValueFor characteristic: CBCharacteristic, error: Error?) {
+        if let error = error {
+            print("error \(error.localizedDescription)")
+            return
+        }
+        print(characteristic)
+        print("response")
+        if let data = characteristic.value {
+            let value = String(data: data, encoding: .utf8) ?? ""
+            print(value)
+        }
+        
+
+    }
+
+    
+    func judgmentValue(string: String) -> (trque: Judgment, angele: Judgment) {
+        var trque = Judgment.notPass
+        var angle = Judgment.notPass
+        
+        if  string == "--" {
+            return (trque, angle)
+        }
+        
+        if string.uppercased() == "DN" {
+            return (.tighteningDirectionNG, .tighteningDirectionNG)
+        }
+        
+        for (index , value) in string.enumerated() {
+            let char = String(value)
+            if index == 0 {
+                trque = checkCharcter(string: char)
+            }
+            if index == 1 {
+                angle = checkCharcter(string: char)
+            }
+        }
+        return (trque, angle)
+    }
+    
+    func checkCharcter(string: String) -> Judgment {
+        Judgment(rawValue: string.uppercased()) ?? .tighteningDirectionNG
+    }
     
 }
 

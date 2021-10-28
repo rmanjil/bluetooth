@@ -12,6 +12,9 @@ import CoreBluetooth
 struct TransferService {
     static let serviceUUID = CBUUID(string: "E20A39F4-73F5-4BC4-A12F-17D1AD07A961")
     static let characteristicUUID = CBUUID(string: "08590F7E-DB05-467E-8757-72F6FAEB13D4")
+    
+    static let serviceTochiUUID = CBUUID(string: "55DF0001-A9B0-11E3-A5E2-000190F08F1E")
+    static let characteristicWriteUUID = CBUUID(string: "55DF0002-A9B0-11E3-A5E2-000190F08F1E")
 }
 
 struct Message {
@@ -189,6 +192,7 @@ extension CentralController {
               let data = screen.textView.text.data(using: .utf8) else {
              return
         }
+       // guard let data = "l,20,u,30".data(using: .utf8) else { return }
         discoveredPeripheral.writeValue(data, for: transferCharacteristic, type: .withoutResponse)
         message.append(Message(message: screen.textView.text, itsMine: true))
         screen.textView.text = ""
