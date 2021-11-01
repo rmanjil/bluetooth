@@ -294,21 +294,39 @@ extension ListController: UITableViewDataSource, UITableViewDelegate {
         guard !(screen.text.text ?? "").isEmpty,
               let discoveredPeripheral = peripheral,
               let transferCharacteristic = transferCharacteristic else {
-                  // let data = "L,10,U,15".data(using: .utf8) else {
                   return
               }
-        "RE037,20.00,10.00".forEach { string in
-            if let data = (String(string)).data(using: .utf8) {
-                discoveredPeripheral.writeValue(data, for: transferCharacteristic, type: .withResponse)
-                
-            }
-            
-        }
-//        if let data = "L,10,U,15".data(using: .utf8) {
+        
+        
+        /// no issuen
+        //        if let data = "AT037,20.00,10.00\r\n".data(using: .utf8) {
+        //            discoveredPeripheral.writeValue(data, for: transferCharacteristic, type: .withResponse) }
+        //        /// no issuen
+        //        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(200)) {
+        //            if let data = "AT023,123456A\r\n".data(using: .utf8) {
+        //                discoveredPeripheral.writeValue(data, for: transferCharacteristic, type: .withResponse) }
+        //        }
+        
+        
+//        if let data = "AT008,02\r\n".data(using: .utf8) {
 //            discoveredPeripheral.writeValue(data, for: transferCharacteristic, type: .withResponse) }
+//
+        //
+        //        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(600)) {
+//                    if let data = "AT045,10.00\r\n".data(using: .utf8) {
+//                        discoveredPeripheral.writeValue(data, for: transferCharacteristic, type: .withResponse) }
+        //        }
+        //
+           //     DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(1200)) {
+                    if let data = "AT046,010,030,060\r\n".data(using: .utf8) {
+                        discoveredPeripheral.writeValue(data, for: transferCharacteristic, type: .withResponse) }
+            //    }
+        //
+        
+        
+        
         
     }
-    
     
 }
 
@@ -423,15 +441,21 @@ extension ListController: CBPeripheralDelegate {
             let oldText = screen.updateValue.text + "\n===============\n"
             screen.updateValue.text = oldText + "\(characteristic.uuid)(\(characteristic.uuid.uuidString)) -> data: (\(string ?? "Empty")), -data (\(str)) at \(Date()) "
             
-//            if value.count == 58 {
-//                print("all value \(value)")
-//
-         //   }
+            //            if value.count == 58 {
+            //                print("all value \(value)")
+            //
+            //   }
             
             if response.contains("\r\n") {
                 print("all value \(response)")
+                
                 let array = response.split(separator: ",")
                 print(array)
+                if array.count < 3 {
+                    print("success")
+                    response = ""
+                    return
+                }
                 torque = String(array[2])
                 
                 unit =  String(array[3])
@@ -475,7 +499,7 @@ extension ListController: CBPeripheralDelegate {
     }
     
     func peripheralIsReady(toSendWriteWithoutResponse peripheral: CBPeripheral) {
-       // sendMessage()
+        // sendMessage()
     }
     
     func peripheral(_ peripheral: CBPeripheral, didWriteValueFor descriptor: CBDescriptor, error: Error?) {
@@ -504,9 +528,9 @@ extension ListController: CBPeripheralDelegate {
             print(value)
         }
         
-
+        
     }
-
+    
     
     func judgmentValue(string: String) -> (trque: Judgment, angele: Judgment) {
         var trque = Judgment.notPass
