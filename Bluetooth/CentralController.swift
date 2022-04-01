@@ -15,6 +15,10 @@ struct TransferService {
     
     static let serviceTochiUUID = CBUUID(string: "55DF0001-A9B0-11E3-A5E2-000190F08F1E")
     static let characteristicWriteUUID = CBUUID(string: "55DF0002-A9B0-11E3-A5E2-000190F08F1E")
+    
+    static let device = "6E98C310-9C87-AD7C-1DD1-E5D9AC8E12A3"
+    
+    static let devices = ["6E98C310-9C87-AD7C-1DD1-E5D9AC8E12A3", "8A5CD670-E27E-3B6E-6E92-4A04F124310F", "9BD4CE60-3A18-6F3E-4BAB-64515B3B90F3"]
 }
 
 struct Message {

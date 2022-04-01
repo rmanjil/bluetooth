@@ -196,7 +196,9 @@ class ListController: BaseController  {
         
         return button
     }()
+    let serviceTochiUUID = CBUUID(string: "55DF0001-A9B0-11E3-A5E2-000190F08F1E")
     
+    var commadn = ""
     
     var response = ""
     var torque = ""
@@ -231,7 +233,7 @@ extension ListController {
     private func observeScreen() {
         screen.reset.publisher(for: .touchUpInside).receive(on: RunLoop.main).sink { [weak self] _ in
             guard let self = self else { return }
-            self.centralManager.scanForPeripherals(withServices: nil, options: nil)
+            self.centralManager.scanForPeripherals(withServices: [self.serviceTochiUUID], options: nil)
             self.screen.tableView.isHidden = false
             self.screen.updateValue.text = ""
             self.screen.valueName.text = ""
@@ -291,7 +293,7 @@ extension ListController: UITableViewDataSource, UITableViewDelegate {
     }
     
     private  func sendMessage() {
-        guard !(screen.text.text ?? "").isEmpty,
+        guard //!(screen.text.text ?? "").isEmpty,
               let discoveredPeripheral = peripheral,
               let transferCharacteristic = transferCharacteristic else {
                   return
@@ -313,15 +315,34 @@ extension ListController: UITableViewDataSource, UITableViewDelegate {
 //
         //
         //        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(600)) {
-//                    if let data = "AT045,10.00\r\n".data(using: .utf8) {
-//                        discoveredPeripheral.writeValue(data, for: transferCharacteristic, type: .withResponse) }
+        
+        let triggerTorque =  "AT045,11.00\r\n"
+        let angle = "AT046,015,030,999\r\n"
+        let test =   "AT037,30.00,20.00\r\n"
+        
+                  // commadn =  test //"AT023,654321A\r\n" // ////"AT008,02\r\n" //
+                    if let data = test.data(using: .utf8) {
+                        discoveredPeripheral.writeValue(data, for: transferCharacteristic, type: .withoutResponse)
+                    }
         //        }
         //
-           //     DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(1200)) {
-                    if let data = "AT046,010,030,060\r\n".data(using: .utf8) {
-                        discoveredPeripheral.writeValue(data, for: transferCharacteristic, type: .withResponse) }
-            //    }
+              
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(200)) {
+            if let data = triggerTorque.data(using: .utf8) {
+                discoveredPeripheral.writeValue(data, for: transferCharacteristic, type: .withoutResponse)
+
+            }
+        }
         //
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(400)) {
+            if let data = angle.data(using: .utf8) {
+                discoveredPeripheral.writeValue(data, for: transferCharacteristic, type: .withoutResponse)
+
+            }
+        }
+        
         
         
         
@@ -345,7 +366,8 @@ extension ListController: CBCentralManagerDelegate {
             screen.tableView.reloadData()
         case .poweredOn:
             consoleLog = "BLE is poweredOn"
-            centralManager.scanForPeripherals(withServices: nil, options: nil)
+          
+            centralManager.scanForPeripherals(withServices: [serviceTochiUUID], options: nil)
         case .resetting:
             consoleLog = "BLE is resetting"
         case .unauthorized:
@@ -367,12 +389,21 @@ extension ListController: CBCentralManagerDelegate {
             remotePeripheral.append(peripheral)
             screen.tableView.reloadData()
         }
+        if  TransferService.devices.contains(peripheral.identifier.uuidString) && self.peripheral == nil {
+            self.peripheral = peripheral
+            peripheral.delegate  = self
+            central.connect(peripheral, options: nil)
+            screen.tableView.isHidden = true
+            screen.deviceDetailHolder.isHidden = !screen.tableView.isHidden
+            central.stopScan()
+        }
         
     }
     
     func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
-        //peripheral.discoverServices(nil)
-        peripheral.discoverServices([TransferService.serviceTochiUUID])
+         peripheral.discoverServices(nil)
+       // peripheral.discoverServices([TransferService.serviceTochiUUID])
+       
         
     }
     
@@ -382,6 +413,10 @@ extension ListController: CBCentralManagerDelegate {
             screen.updateValue.text = "\(peripheral.name ?? "NO_NAME") -> \(error.localizedDescription) \(Date())"
         }
         
+    }
+    
+    func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
+        print("=================peripheral didDisconnectPeripheral: \(peripheral) \n error \(error)  ============")
     }
     
 }
@@ -420,7 +455,6 @@ extension ListController: CBPeripheralDelegate {
             if characteristic.properties.contains(.write) {
                 print("\(characteristic.uuid): properties contains .write")
                 transferCharacteristic = characteristic
-                
             }
             
         }
@@ -433,11 +467,11 @@ extension ListController: CBPeripheralDelegate {
             
             let string = String(data: data, encoding: .utf8)
             let str = String(decoding: data, as: UTF8.self)
-            let oldValue  = screen.valueName.text ?? ""
+           // let oldValue  = screen.valueName.text ?? ""
             
             response += string ?? ""
             
-            screen.valueName.text = oldValue +  (string ?? "")
+           // screen.valueName.text = oldValue +  (string ?? "")
             let oldText = screen.updateValue.text + "\n===============\n"
             screen.updateValue.text = oldText + "\(characteristic.uuid)(\(characteristic.uuid.uuidString)) -> data: (\(string ?? "Empty")), -data (\(str)) at \(Date()) "
             
@@ -448,22 +482,24 @@ extension ListController: CBPeripheralDelegate {
             
             if response.contains("\r\n") {
                 print("all value \(response)")
-                
+                let neededValue =  screen.valueName.text ?? ""
+                screen.valueName.text = neededValue + "\n" + response
                 let array = response.split(separator: ",")
                 print(array)
                 if array.count < 3 {
                     print("success")
+                    screen.updateValue.text = "Command: \(commadn) \n response: \(response)"
                     response = ""
                     return
                 }
-                torque = String(array[2])
-                
-                unit =  String(array[3])
-                angele =  String(array[4])
-                angleUnit =  String(array[5])
-                judgment =  String(array[6])
-                date =  String(array[8])
-                time =  String(array[9])
+//                torque = String(array[2])
+//
+//                unit =  String(array[3])
+//                angele =  String(array[4])
+//                angleUnit =  String(array[5])
+//                judgment =  String(array[6])
+//                date =  String(array[8])
+//                time =  String(array[9])
                 
                 let final = judgmentValue(string: judgment)
                 response = ""
@@ -507,6 +543,7 @@ extension ListController: CBPeripheralDelegate {
             print("error \(error.localizedDescription)")
             return
         }
+        print("didWriteValueFor \(descriptor)")
     }
     
     func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor descriptor: CBDescriptor, error: Error?) {
@@ -514,6 +551,7 @@ extension ListController: CBPeripheralDelegate {
             print("error \(error.localizedDescription)")
             return
         }
+        print("didUpdateValueFor \(descriptor)")
     }
     
     func peripheral(_ peripheral: CBPeripheral, didWriteValueFor characteristic: CBCharacteristic, error: Error?) {
@@ -522,13 +560,13 @@ extension ListController: CBPeripheralDelegate {
             return
         }
         print(characteristic)
-        print("response")
+        print("didWriteValueFor characteristic:")
         if let data = characteristic.value {
             let value = String(data: data, encoding: .utf8) ?? ""
             print(value)
         }
         
-        
+    
     }
     
     
